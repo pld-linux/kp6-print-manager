@@ -3,12 +3,12 @@
 %define		kaname		print-manager
 Summary:	Print manager
 Name:		kp6-%{kaname}
-Version:	6.3.5
+Version:	6.8.2
 Release:	1
 License:	GPL v2+/LGPL v2.1+
 Group:		X11/Applications
 Source0:	http://download.kde.org/stable/plasma/%{version}/%{kaname}-%{version}.tar.xz
-# Source0-md5:	d983d3773f981e24d40394fcd310b210
+# Source0-md5:	6834c8f81334d3bd19ef1ed526ec9bbe
 URL:		http://www.kde.org/
 BuildRequires:	Qt6Core-devel >= %{qtver}
 BuildRequires:	cmake >= 2.8.12
@@ -34,6 +34,8 @@ BuildRequires:	rpmbuild(macros) >= 1.164
 BuildRequires:	shared-mime-info
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
+Requires(post,postun):	desktop-file-utils
+%requires_eq_to Qt6Core Qt6Core-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -61,25 +63,28 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+%update_desktop_database_post
+
+%postun
+%update_desktop_database_postun
+
 %files -f %{kaname}.lang
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/configure-printer
-%attr(755,root,root) %{_bindir}/kde-add-printer
-%attr(755,root,root) %{_bindir}/kde-print-queue
-%attr(755,root,root) %{_libdir}/libkcupslib.so.%{version}
-%attr(755,root,root) %{_libdir}/qt6/plugins/plasma/kcms/systemsettings/kcm_printer_manager.so
-%attr(755,root,root) %{_libdir}/qt6/plugins/kf6/kded/printmanager.so
+%attr(755,root,root) %{_bindir}/plasma-print-queue
+%{_libdir}/libkcups.so
+%{_libdir}/qt6/plugins/plasma/applets/org.kde.plasma.printmanager.so
+%{_libdir}/qt6/plugins/plasma/kcms/systemsettings/kcm_printer_manager.so
+%{_libdir}/qt6/plugins/kf6/kded/printmanager.so
 %dir %{_libdir}/qt6/qml/org/kde/plasma/printmanager
 %{_libdir}/qt6/qml/org/kde/plasma/printmanager/qmldir
-%{_libdir}/qt6/qml/org/kde/plasma/printmanager/kcupslib.qmltypes
 %{_libdir}/qt6/qml/org/kde/plasma/printmanager/kde-qmlmodule.version
-%{_libdir}/qt6/qml/org/kde/plasma/printmanager/libkcupslibplugin.so
+%{_libdir}/qt6/qml/org/kde/plasma/printmanager/kcups.qmltypes
+%{_libdir}/qt6/qml/org/kde/plasma/printmanager/libkcupsplugin.so
+%{_desktopdir}/kcm_printer_manager.desktop
 %{_desktopdir}/org.kde.ConfigurePrinter.desktop
-%{_desktopdir}/org.kde.PrintQueue.desktop
-%{_desktopdir}/org.kde.kde-add-printer.desktop
+%{_desktopdir}/org.kde.plasma.printqueue.desktop
 %{_datadir}/knotifications6/printmanager.notifyrc
-%{_datadir}/applications/kcm_printer_manager.desktop
-%{_datadir}/metainfo/org.kde.plasma.printmanager.appdata.xml
-%{_datadir}/metainfo/org.kde.print-manager.metainfo.xml
-%{_datadir}/plasma/plasmoids/org.kde.plasma.printmanager
 %{_datadir}/qlogging-categories6/pmlogs.categories
+%{_datadir}/metainfo/org.kde.print-manager.metainfo.xml
